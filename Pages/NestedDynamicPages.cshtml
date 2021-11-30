@@ -1,0 +1,77 @@
+﻿@page "/nested/{parent?}/{child?}"
+@model DynamicNestedPages.Pages.NestedDynamicPagesModel
+@inject ItemManager itemManager
+@{
+}
+
+<h1>@(Model.ParentName ?? "[No Parent Specified]") - @(Model.ChildName ?? "[No Child Specified]")</h1>
+
+<ul>
+    @foreach (var item in itemManager.TopLevelItems)
+    {
+        <li>
+            <h4>
+                <a asp-page="/NestedDynamicPages" asp-route-parent="@item.Name">@item.Name</a>
+            </h4>
+            <ul>
+                @foreach (var child in item.Children)
+                {
+                    <li>
+                        <h6>
+                            <a asp-page="/NestedDynamicPages" asp-route-parent="@item.Name" asp-route-child="@child">@child</a>
+                        </h6>
+                    </li>
+                }
+            </ul>
+        </li>
+
+    }
+</ul>
+
+<h4>Add Parent</h4>
+<div class="col-md-6 col-sm-12 mx-auto mb-5">
+    <form method="post" asp-page-handler="AddParent">
+        <div class="mb-3 row">
+            <div class="col-sm-4 text-sm-end align-self-center">
+                <label class="form-label" asp-for="ParentName"></label>
+            </div>
+            <div class="col">
+                <input class="form-control" asp-for="ParentName" />
+                <span class="form-text" asp-validation-for="ParentName"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 text-sm-end align-self-center">
+            </div>
+            <div class="col-8">
+                <button type="submit" class="btn btn-outline-primary">Add New Parent</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (Model.ParentName != null)
+{
+    <h4>Add Child to @Model.ParentName</h4>
+    <div class="col-md-6 col-sm-12 mx-auto mb-5">
+        <form method="post" asp-page-handler="AddChild">
+            <input type="hidden" name="ParentName" value="@Model.ParentName" />
+            <div class="mb-3 row">
+                <div class="col-sm-4 text-sm-end align-self-center">
+                    <label class="form-label" asp-for="ChildName"></label>
+                </div>
+                <div class="col">
+                    <input class="form-control" asp-for="ChildName" />
+                    <span class="form-text" asp-validation-for="ChildName"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 text-sm-end align-self-center">
+                </div>
+                <div class="col-8">
+                    <button type="submit" class="btn btn-outline-primary">Add Child to @Model.ParentName</button>
+                </div>
+            </div>
+        </form>
+    </div>
+}
